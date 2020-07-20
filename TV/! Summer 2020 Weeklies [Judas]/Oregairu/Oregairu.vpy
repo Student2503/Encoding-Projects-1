@@ -27,7 +27,7 @@ src = depth(src, 16)
 # amazon = depth(amazon, 32)
 rescaled = stf.rescale(src, src)
 # Filtering
-denoise = core.knlm.KNLMeansCL(depth(rescaled, 32),h=0.2, d=2, a=3, device_type = 'gpu', device_id = 1)
+denoise = core.knlm.KNLMeansCL(depth(rescaled, 32),h=0.2, d=2, a=3)
 deband = stf.masked_deband(denoise, iterations=1, grain = 0)
 aa = lvf.aa.nneedi3_clamp(deband)
 grain = kgf.adaptive_grain(aa, 0.10, luma_scaling=10)

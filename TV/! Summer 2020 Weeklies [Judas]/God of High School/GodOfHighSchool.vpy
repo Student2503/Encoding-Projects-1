@@ -20,11 +20,11 @@ src = core.ffms2.Source(srcFile)
 src = depth(src, 16)
 
 # Filtering
-denoise = core.knlm.KNLMeansCL(src,h=0.5, d=2)
+denoise = core.knlm.KNLMeansCL(src,h=0.3, d=2)
 deband = stf.masked_deband(denoise)
 aa = lvf.aa.nneedi3_clamp(deband)
 dehalo = stf.dehalo(aa)
-grain = kgf.adaptive_grain(dehalo, 0.15, luma_scaling=8)
+grain = kgf.adaptive_grain(dehalo, 0.20, luma_scaling=10)
 
 # Output
 final = depth(grain, 10)

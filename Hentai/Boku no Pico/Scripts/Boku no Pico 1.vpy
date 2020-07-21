@@ -1,47 +1,46 @@
 import vapoursynth as vs
-core = vs.get_core()
-# import kagefunc as kgf
+core = vs.core
+
+from typing import Any, Callable, Dict, Optional
+from vsTAAmbk import TAAmbk as taa
+import stolenfunc as stf
 import lvsfunc as lvf
+import kagefunc as kgf
 import fvsfunc as fvf
-import vsutil
-# from nnedi3_rpow2 import nnedi3_rpow2
+from typing import Optional
+from vsutil import *
+import sys
+import nnedi3_rpow2
 import mvsfunc as mvf
 # import muvsfunc as muf
-import vsTAAmbk as taa
 # import adjust
-from rekt import *
 # import havsfunc as haf
 core.max_cache_size = 8096
+shader  = r"Z:/Misc stuff/FSRCNNX_x2_16-0-4-1.glsl"
 
 # Input
-src = lvf.src(r'D:\Projects\Boku no Pico\Source\Boku no Pico Remux.mkv')
-src = fvf.Depth(src, 8)
-src = core.std.AssumeFPS(src, fpsnum=30000, fpsden=1001)
+src = lvf.src(r'Z:/Encoding-Projects/Hentai/Boku no Pico/Sources/Remuxed disc 1/title_t01.mkv')
+src = depth(src, 8)
+cropped = core.std.Crop(src, top = 66, bottom = 70)
 
-nnedi3 = core.nnedi3cl.NNEDI3CL(src, 1,planes=[0,1,2], device=0, info = False)                                       # Deinterlacing
-decomb = lvf.decomb(nnedi3, False, decimate = False, vinv = True)
-vdecimate = core.vivtc.VDecimate(decomb, cycle=5)
+decomb = lvf.deinterlace.decomb(cropped, TFF = False, decimate = False, vinv = True)
+vdecimate = core.vivtc.VDecimate(decomb)
+dec = core.std.AddBorders(vdecimate, top = 66, bottom = 70)
+fix = core.edgefixer.ContinuityFixer(vdecimate, [2,0,0], [0,0,0], [2,0,0], [0,0,0], [5,0,0])
+fix = core.std.AddBorders(fix, top = 66, bottom = 70)
 
-deinterlaced = fvf.Depth(vdecimate, 16)
+denoise = core.knlm.KNLMeansCL(depth(fix, 16), a=3, h=0.3, d=2)
+deband = stf.masked_deband(denoise, grain = 0) 
 
-luma = core.knlm.KNLMeansCL(deinterlaced,a=2, h=0.7, d=3, channels="y")                                             # Denoising
-chroma = core.knlm.KNLMeansCL(luma,a=1, h=0.7, d=2, channels="uv")
+awarpsharp = core.warp.AWarpSharp2(depth(deband, 16), depth=12, planes=[1,2])
+warped = core.std.ShufflePlanes([deband, awarpsharp, awarpsharp], [0,1,2], colorfamily=src.format.color_family)
 
-aa = fvf.Depth(chroma, 16)                                                                                          # Anti-aliasing
-aa  = taa.TAAmbk(aa, aatype='Nnedi3')
+grain = kgf.adaptive_grain(warped, 0.15, luma_scaling=10)
+edge = core.std.Crop(grain, top = 66, bottom = 72)
+edge = core.std.AddBorders(edge, top = 66, bottom = 72)
 
-awarpsharp = core.warp.AWarpSharp2(aa, depth=16, planes=[1,2])                                                      # Sharpening chroma
-warped = core.std.ShufflePlanes([aa, awarpsharp, awarpsharp], [0,1,2], colorfamily=src.format.color_family)
-
-warped = fvf.Depth(warped, 8)
-
-deband = rektdb(warped, range=16, y=40, cb=32, cr=32, grainy=4, grainc=4, output_depth=16)                          # Debanding
-
-final = fvf.Depth(deband, 10)                                                                                       
-comp =  fvf.Depth(deband, 16)
-
-final.set_output()                                                                                                  # Output
-
-
-#lvf.comp(comp,deinterlaced).set_output()                                                                           # Comparisions
-#core.std.Interleave([comp, deinterlaced]).set_output()
+final = depth(edge, 10)
+final.set_output()
+# core.std.Interleave([depth(dec, 10),depth(fcb, 10)]).set_output()
+# 19059
+# 47246

@@ -50,5 +50,5 @@ grain = kgf.adaptive_grain(dehalo, 0.20, luma_scaling=10)
 
 # Output
 final = depth(grain, 10)
-grain.set_output()
+final.set_output()
 # core.std.Interleave([depth(src, 10),depth(final, 10)]).set_output()

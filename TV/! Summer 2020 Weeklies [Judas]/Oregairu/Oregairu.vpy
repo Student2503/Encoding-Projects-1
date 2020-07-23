@@ -37,6 +37,8 @@ def rescale(clip: vs.VideoNode, ref: vs.VideoNode, width: int = 1920, height: in
 # erai = core.std.Trim(erai, first = 144)
 # Judas = lvf.src(r'Z:/Downloads/! Sonarr/imported-sonarr/[Judas] Oregairu - S03E02.mkv')
 # motbob = lvf.src(r'Z:/Downloads/! Sonarr/imported-sonarr/[MTBB] Yahari Ore no Seishun Love Comedy wa Machigatteiru. Kan - 02 [04BE0754].mkv')
+# test = lvf.src(r'Z:\Encoding-Projects\TV\! Summer 2020 Weeklies [Judas]\Oregairu\encoded/[SNAFU] Yahari Ore no Seishun Love Comedy wa Machigatteiru. Kan - 02 [1C7D7345].mkv')
+# test = core.std.AssumeFPS(test, fpsnum = 24000, fpsden = 1001)
 
 srcFile = src_path.decode("utf-8")
 print(file=sys.stderr)
@@ -47,11 +49,12 @@ src = depth(src, 16)
 rescaled = rescale(src, src)
 # Filtering
 denoise = core.knlm.KNLMeansCL(depth(rescaled, 16),h=0.3, d=2, a=3)
-deband = stf.masked_deband(denoise, iterations=1, grain = 0)
+deband = stf.masked_deband(rescaled, iterations=1, threshold = 3.2, radius = 18, grain = 0)
 aa = lvf.aa.nneedi3_clamp(deband)
-grain = kgf.adaptive_grain(aa, 0.08, luma_scaling=12)
+grain = kgf.adaptive_grain(aa, 0.15, luma_scaling=10)
 
 # Output
 final = depth(grain, 10)
+# cropped = core.std.Trim(motbob, first = 15000, last = 15020)
 final.set_output()
-# core.std.Interleave([depth(motbob, 10),depth(final, 10)]).set_output()
+# core.std.Interleave([depth(cropped, 10),depth(test, 10)]).set_output()

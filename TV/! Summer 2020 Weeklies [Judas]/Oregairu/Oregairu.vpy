@@ -51,7 +51,7 @@ rescaled = rescale(src, src)
 denoise = core.knlm.KNLMeansCL(depth(rescaled, 16),h=0.3, d=2, a=3)
 deband = stf.masked_deband(rescaled, iterations=1, threshold = 3.2, radius = 18, grain = 0)
 aa = lvf.aa.nneedi3_clamp(deband)
-grain = kgf.adaptive_grain(aa, 0.15, luma_scaling=10)
+grain = kgf.adaptive_grain(aa, 0.10, luma_scaling=10)
 
 # Output
 final = depth(grain, 10)

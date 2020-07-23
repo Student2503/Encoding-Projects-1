@@ -46,12 +46,12 @@ src = depth(src, 16)
 
 rescaled = rescale(src, src)
 # Filtering
-denoise = core.knlm.KNLMeansCL(depth(rescaled, 16),h=0.2, d=2, a=3)
+denoise = core.knlm.KNLMeansCL(depth(rescaled, 16),h=0.3, d=2, a=3)
 deband = stf.masked_deband(denoise, iterations=1, grain = 0)
-aa = taa(deband, 3)
-grain = kgf.adaptive_grain(aa, 0.10, luma_scaling=10)
+aa = lvf.aa.nneedi3_clamp(deband)
+grain = kgf.adaptive_grain(aa, 0.08, luma_scaling=12)
 
 # Output
 final = depth(grain, 10)
 final.set_output()
-# core.std.Interleave([depth(motbob, 10),depth(rescaled, 10)]).set_output()
+# core.std.Interleave([depth(motbob, 10),depth(final, 10)]).set_output()

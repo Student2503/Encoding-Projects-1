@@ -21,7 +21,7 @@ src = depth(src, 16)
 
 # Filtering
 deband = stf.masked_deband(src, iterations = 1, threshold = 3.2, radius = 18, grain = 0)
-grain = kgf.adaptive_grain(deband, 0.20, luma_scaling=10)
+grain = kgf.adaptive_grain(deband, 0.10, luma_scaling=10)
 
 # Output
 final = depth(grain, 10)

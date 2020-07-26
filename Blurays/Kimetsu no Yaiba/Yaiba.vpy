@@ -13,16 +13,10 @@ import sys
 core.max_cache_size = 16 * 1024
 
 # Source
-srcFile = src_path.decode("utf-8")
-print(file=sys.stderr)
-print(f"Vapoursynth: Beginning job - (", srcFile, ")", file=sys.stderr)
-src = core.ffms2.Source(srcFile)
-src = depth(src, 16)
-
-# Filtering
-deband = stf.masked_deband(src, iterations = 1, threshold = 3.2, radius = 18, grain = 0)
-grain = kgf.adaptive_grain(deband, 0.10, luma_scaling=10)
-
+AnimeTime = lvf.src(r'Z:\Downloads\! Nyaa\[Anime Time] Demon Slayer [BD P1][Dual-Audio][1080p][HEVC 10bit x265][AAC]/[Anime Time] Demon Slayer - S01E02 - Trainer Sakonji Urokodaki.mkv')
+beatrice = lvf.src(r'E:\!Seedbox/[Beatrice-Raws] Kimetsu no Yaiba 02 [BDRip 1920x1080 HEVC FLAC].mkv')
+Judas = lvf.src(r'E:\!Seedbox/[Judas] Kimetsu no Yaiba 02 [BDRip 1920x1080 HEVC FLAC].mkv')
 # Output
-final = depth(grain, 10)
-final.set_output()
+# final = depth(grain, 10)
+# final.set_output()
+core.std.Interleave([beatrice, Judas]).set_output()

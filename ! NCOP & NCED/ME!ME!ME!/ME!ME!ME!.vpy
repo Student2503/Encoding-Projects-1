@@ -30,7 +30,7 @@ def rescale(clip: vs.VideoNode, ref: vs.VideoNode, width: int = 1920, height: in
     return join([merge,plane(ref, 1), plane(ref, 2)])
 
 # Source
-src = lvf.src(r'src/[Smoke] Nihon Animator Mihonichi 03 -  ME!ME!ME! (BD 1080p).mkv')
+src = lvf.src(r'[Smoke] Nihon Animator Mihonichi 03 -  ME!ME!ME! (BD 1080p).mkv')
 # srcFile = src_path.decode("utf-8")
 # print(file=sys.stderr)
 # print(f"Vapoursynth: Beginning job - (", srcFile, ")", file=sys.stderr)

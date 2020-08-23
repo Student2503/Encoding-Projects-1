@@ -18,6 +18,7 @@
 *.lvi
 *.part
 *.ISO
+*.glsl
 
 
 # User-specific files (MonoDevelop/Xamarin Studio)

@@ -59,10 +59,10 @@ def masked_deband(clip: vs.VideoNode,
 # hs720 = lvf.src(r'Z:/Downloads/! Nyaa/[HorribleSubs] Deca-Dence - 08 [720p].mkv')
 # hs720 = core.resize.Bicubic(hs720, 1920, 1080).set_output(6)
 
-# srcFile = src_path.decode("utf-8")
-# print(file=sys.stderr)
-# print(f"Vapoursynth: Beginning job - (", srcFile, ")", file=sys.stderr)
-# src = core.ffms2.Source(srcFile)
+srcFile = src_path.decode("utf-8")
+print(file=sys.stderr)
+print(f"Vapoursynth: Beginning job - (", srcFile, ")", file=sys.stderr)
+src = core.ffms2.Source(srcFile)
 src = depth(src, 32)
 
 # Filtering

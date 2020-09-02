@@ -59,10 +59,10 @@ def masked_deband(clip: vs.VideoNode,
 # hs720 = lvf.src(r'Z:/Downloads/! Nyaa/[HorribleSubs] Deca-Dence - 08 [720p].mkv')
 # hs720 = core.resize.Bicubic(hs720, 1920, 1080).set_output(6)
 
-srcFile = src_path.decode("utf-8")
-print(file=sys.stderr)
-print(f"Vapoursynth: Beginning job - (", srcFile, ")", file=sys.stderr)
-src = core.ffms2.Source(srcFile)
+# srcFile = src_path.decode("utf-8")
+# print(file=sys.stderr)
+# print(f"Vapoursynth: Beginning job - (", srcFile, ")", file=sys.stderr)
+# src = core.ffms2.Source(srcFile)
 src = depth(src, 32)
 
 # Filtering
@@ -70,14 +70,14 @@ fix = core.edgefixer.ContinuityFixer(depth(src, 16), [1,1,1], [1,1,1], [1,1,1], 
 fix = depth(fix, 32)
 rescaled = rescale(fix, fix)
 denoise = core.knlm.KNLMeansCL(rescaled,h=0.4, d=2, a=4, s=3)
-deband = stf.masked_deband(denoise, iterations=1, threshold = 3.8, radius = 18, grain = 1, lr=3,brz_a=0.020,brz_b=0.020)
+deband = stf.masked_deband(denoise, iterations=1, threshold = 4.0, radius = 18, grain = 1, lr=3,brz_a=0.020,brz_b=0.020)
 aa = taa(depth(deband, 16), 3)
 dehalo = stf.dehalo(aa)
-grain = kgf.adaptive_grain(dehalo, 0.30, luma_scaling=8)
+grain = kgf.adaptive_grain(dehalo, 0.35, luma_scaling=8)
 
 # Output
  
 final = depth(grain, 10)
-final = core.std.Trim(final, first = 9000, last = 9800)
+# final = core.std.Trim(final, first = 9000, last = 9800)
 final.set_output()
 # core.std.Interleave([depth(final, 10),depth(src, 10)]).set_output()

@@ -1,6 +1,6 @@
 import vapoursynth as vs
 core = vs.core
-
+import os
 from typing import Any, Callable, Dict, Optional
 import stolenfunc as stf
 import mvsfunc as mvf
@@ -11,9 +11,16 @@ from vsTAAmbk import TAAmbk as taa
 import havsfunc as haf
 from vsutil import *
 import sys
-core.max_cache_size = 8 * 1024
+core.max_cache_size = 128 * 1024
+core.num_threads = 20
 
-shader = "C:/FSRCNNX_x2_16-0-4-1.glsl"
+GPU_ONE = 0
+GPU_TWO = 1
+
+shader = 'FSRCNNX_x2_56-16-4-1.glsl'
+if os.path.exists(shader) is False:
+    hookpath = r"mpv/shaders/FSRCNNX_x2_56-16-4-1.glsl"
+    shader = os.path.join(os.getenv("APPDATA"), hookpath)
 
 def rescale(clip: vs.VideoNode, ref: vs.VideoNode, width: int = 1920, height: int = 1080, weight: float = 0.5) -> vs.VideoNode:
     
@@ -43,7 +50,7 @@ src = depth(src, 32)
 # Filtering
 
 rescaled = rescale(src, src)
-denoise = core.knlm.KNLMeansCL(rescaled,h=0.4, d=2, a=3, s=4)
+denoise = core.knlm.KNLMeansCL(rescaled,h=0.4, d=2, a=3, s=4, device_id=GPU_ONE)
 deband = stf.masked_deband(denoise, iterations=1, threshold = 3.6, radius = 18, grain = 1, lr=3,brz_a=0.020,brz_b=0.020)
 aa = taa(depth(deband, 16), 3)
 grain = kgf.adaptive_grain(aa, 0.25, luma_scaling=6)

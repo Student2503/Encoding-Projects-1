@@ -14,12 +14,12 @@ import sys
 core.max_cache_size = 8 * 1024
 
 # Source
-# src = lvf.src(r'src/[HorribleSubs] Monster Musume no Oisha-san - 08 [1080p].mkv')
+src = lvf.src(r'src/[HorribleSubs] Monster Musume no Oisha-san - 08 [1080p].mkv')
 
-srcFile = src_path.decode("utf-8")
-print(file=sys.stderr)
-print(f"Vapoursynth: Beginning job - (", srcFile, ")", file=sys.stderr)
-src = core.ffms2.Source(srcFile)
+# srcFile = src_path.decode("utf-8")
+# print(file=sys.stderr)
+# print(f"Vapoursynth: Beginning job - (", srcFile, ")", file=sys.stderr)
+# src = core.ffms2.Source(srcFile)
 src = depth(src, 32)
 
 # Filtering

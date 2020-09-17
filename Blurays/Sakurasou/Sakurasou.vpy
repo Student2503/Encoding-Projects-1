@@ -6,10 +6,11 @@ import stolenfunc as stf
 import mvsfunc as mvf
 import lvsfunc as lvf
 import kagefunc as kgf
+import fvsfunc as fvf
 from typing import Optional
 from vsutil import *
 import sys
-core.max_cache_size = 6 * 1024
+core.max_cache_size = 8 * 1024
 
 shader = "C:/FSRCNNX_x2_16-0-4-1.glsl"
 
@@ -29,42 +30,48 @@ def rescale(clip: vs.VideoNode, ref: vs.VideoNode, width: int = 1920, height: in
     merge = merge.resize.Bicubic(width=width, height=height)  
     return join([merge,plane(ref, 1), plane(ref, 2)])
 
-def masked_deband(clip: vs.VideoNode, 
-                  ref: vs.VideoNode = None,
-                  show_mask: bool = False,
-                  lr: int = 3, brz_a: float = 0.05, brz_b: float = 0.05, 
-                  radius:  int = 15, threshold: float = 3, iterations: int = 1,
-                  grain: int = 5.0, mask_denoise: Optional[float] = None, **kwargs) -> vs.VideoNode:
-        deband = join([
-              core.placebo.Deband(plane(clip, 0), grain=grain, iterations=iterations, threshold=threshold, radius =radius),
-              core.placebo.Deband(plane(clip, 1),grain=0, iterations=iterations, threshold=threshold, radius =radius),
-              core.placebo.Deband(plane(clip, 2), grain=0, iterations=iterations, threshold=threshold, radius =radius)
-                 ])     
-        mask = lvf.denoise.detail_mask(ref, pre_denoise=mask_denoise, rad=lr, radc=2, brz_a=brz_a, brz_b=brz_b) if ref is not None else False
-        if show_mask:
-           return mask
-        return core.std.MaskedMerge(deband, clip, mask) if mask else deband
-
 # Source
-# src = lvf.src(r'Sakurasou no Pet na Kanojo – 01 [BDRemux 1920x1080 x264 PCM].mkv')
-# yousei = lvf.src(r'src/[Yousei-raws] Sakurasou no Pet na Kanojo 01 [BDrip 1920x1080 x264 FLAC].mkv')
-#yousei = core.std.Trim(yousei, first = 15000, last = 15500)
-#encoded = lvf.src(r'encoded/Sakurasou no Pet na Kanojo – 01 [BDRemux 1920x1080 x264 PCM].mkv')
+# src = lvf.src(r'Sakurasou no Pet na Kanojo – 01.mkv')
 srcFile = src_path.decode("utf-8")
 print(file=sys.stderr)
 print(f"Vapoursynth: Beginning job - (", srcFile, ")", file=sys.stderr)
 src = core.ffms2.Source(srcFile)
 src = depth(src, 32)
 
+
 # Filtering
 rescaled = rescale(src, src)
-deband = stf.masked_deband(rescaled, iterations=1, threshold = 2.6, radius = 24, grain = 0, lr=3,brz_a=0.020,brz_b=0.020)
-aa = lvf.aa.nneedi3_clamp(deband)
-grain = kgf.adaptive_grain(depth(aa, 16), 0.25, luma_scaling=8)
+
+aa = lvf.aa.nneedi3_clamp(rescaled)
+dehalo = stf.dehalo(depth(aa, 16))
+dehalo = depth(dehalo, 32)
+
+deband_a = stf.masked_deband(dehalo, iterations=1, threshold = 3.0, radius = 22, grain = 0, lr=3,brz_a=0.020,brz_b=0.020)
+deband_b = stf.masked_deband(dehalo, iterations=1, threshold = 2.4, radius = 26, grain = 0, lr=3,brz_a=0.030,brz_b=0.030)
+
+deband = fvf.rfs(deband_a, deband_b, mappings="[257 339]")
+deband = fvf.rfs(deband, deband_b, mappings="[5965 6015]")
+deband = fvf.rfs(deband, deband_b, mappings="[9984 10128]")
+deband = fvf.rfs(deband, deband_b, mappings="[10247 10586]")
+deband = fvf.rfs(deband, deband_b, mappings="[18797 18894]")
+deband = fvf.rfs(deband, deband_b, mappings="[20988 21633]")
+deband = fvf.rfs(deband, deband_b, mappings="[24020 24257]")
+
+grain_a = kgf.adaptive_grain(depth(deband, 16), 0.25, luma_scaling=10)
+grain_b = kgf.adaptive_grain(depth(deband, 16), 0.75, luma_scaling=20)
+
+grain = fvf.rfs(grain_a, grain_b, mappings="[257 339]")
+grain = fvf.rfs(grain, grain_b, mappings="[5965 6015]")
+grain = fvf.rfs(grain, grain_b, mappings="[9984 10128]")
+grain = fvf.rfs(grain, grain_b, mappings="[10247 10586]")
+grain = fvf.rfs(grain, grain_b, mappings="[18797 18894]")
+grain = fvf.rfs(grain, grain_b, mappings="[20988 21633]")
+grain = fvf.rfs(grain, grain_b, mappings="[24020 24257]")
 
 # Output
  
 final = depth(grain, 10)
-final.set_output()
-#core.std.Interleave([depth(src, 10),depth(final, 10)]).set_output()
-#core.std.Interleave([depth(encoded, 10),depth(yousei, 10)]).set_output()
+# temp cuts because my encode broke midway
+trimmed = core.std.Trim(final, first=31079)
+
+trimmed.set_output()

@@ -44,7 +44,7 @@ srcFile = src_path.decode("utf-8")
 print(file=sys.stderr)
 print(f"Vapoursynth: Beginning job - (", srcFile, ")", file=sys.stderr)
 src = core.ffms2.Source(srcFile)
-src = depth(mtbb, 16)
+src = depth(src, 16)
 
 # Filtering
 aa = lvf.aa.nneedi3_clamp(src)

@@ -47,18 +47,6 @@ def masked_deband(clip: vs.VideoNode,
         return core.std.MaskedMerge(deband, clip, mask) if mask else deband
 
 
-# Source
-# src = lvf.src(r'Deca-Dence - 1x08 - Turbine [WEB-1080p x264 AAC] [HorribleSubs].mkv')
-# encoded = lvf.src(r'Z:/testing/deca/encoded/Deca-Dence - 1x08 - Turbine [WEB-1080p x264 AAC] [HorribleSubs].mkv').set_output()
-# encoded = core.std.AssumeFPS(encoded, fpsnum=24000,fpsden=1001)
-# ffa = lvf.src(r'Z:/Downloads/! Nyaa/[FFA] Deca-Dence - 08 [1080p][HEVC][AAC].mkv').set_output(2)
-# animetime = lvf.src(r'Z:/Downloads/! Nyaa/[Anime Time] Deca-Dence - 08 [1080p][HEVC 10bit x265][AAC][Eng Sub].mkv').set_output(3)
-# akihito = lvf.src(r'Z:/Downloads/! Nyaa/[AkihitoSubs] Deca-Dence - S01E08.mkv').set_output(4)
-# ember = lvf.src(r'Z:/Downloads/! Nyaa/[EMBER] Deca-Dence - 08.mkv').set_output(5)
-# # arata = lvf.src(r'Z:/Downloads/! Nyaa/Deca-Dence - 08 [1080p].mkv')
-# hs720 = lvf.src(r'Z:/Downloads/! Nyaa/[HorribleSubs] Deca-Dence - 08 [720p].mkv')
-# hs720 = core.resize.Bicubic(hs720, 1920, 1080).set_output(6)
-
 srcFile = src_path.decode("utf-8")
 print(file=sys.stderr)
 print(f"Vapoursynth: Beginning job - (", srcFile, ")", file=sys.stderr)

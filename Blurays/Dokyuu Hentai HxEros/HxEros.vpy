@@ -31,25 +31,8 @@ def rescale(clip: vs.VideoNode, ref: vs.VideoNode, width: int = 1920, height: in
     merge = merge.resize.Spline36(width=width, height=height)  
     return join([merge,plane(ref, 1), plane(ref, 2)])
 
-def upscale(clip: vs.VideoNode, ref: vs.VideoNode, width: int = 1920, height: int = 1080, weight: float = 0.5) -> vs.VideoNode:
-    
-    args = dict(nsize=0, nns=3, qual=2, pscrn=1)
-    clip = get_y(clip)
-    nn3 = clip.std.Transpose().znedi3.nnedi3(0, True, **args)\
-          .std.Transpose().znedi3.nnedi3(0, True, **args)
-    nn3 = core.resize.Spline36(nn3, src_top=.5, src_left=.5)
-
-    fsrcnnx = clip.resize.Point(format=vs.YUV444P16, dither_type=None)
-    fsrcnnx = depth(core.placebo.Shader(fsrcnnx, width = clip.width * 2, height = clip.height * 2,
-                                        shader = shader, filter = 'haasnsoft'), 32)
-    merge = core.std.Merge(get_y(nn3), get_y(fsrcnnx), weight=weight)
-    merge = merge.resize.Spline36(width=width, height=height)  
-    return join([merge,plane(ref, 1), plane(ref, 2)])
-
 # Source
 src = lvf.src(r'src/00001.m2ts')
-# HS = lvf.src(r'Z:\Downloads\! Nyaa\[HorribleSubs] Dokyuu Hentai HxEros - 01 [1080p].mkv')
-# HS = HS[289:]
 
 # srcFile = src_path.decode("utf-8")
 # print(file=sys.stderr)
@@ -97,14 +80,7 @@ grain = kgf.adaptive_grain(dehalo, 0.25, luma_scaling=8)
 
 final = depth(grain, 10)
 final.set_output()
-# core.std.Interleave([depth(src, 8),depth(src, 8)]).set_output()
-# core.std.Interleave([depth(src, 8),depth(upaa, 8)]).set_output(1)
-# core.std.Interleave([depth(src, 8),depth(nneediaa, 8)]).set_output(2)
-# core.std.Interleave([depth(src, 8),depth(taa, 8)]).set_output(3)
 # core.std.Interleave([depth(src, 8),depth(rescaled, 8)]).set_output(4)
-
-
-# lvf.comparison.tvbd_diff(websrc, src,return_array=True).set_output()
 
 # 16892 - Fade
 # 20464 - Noisy shite

@@ -144,7 +144,7 @@ fixed_waka = ep1_p1+ep1_p2+ep1_p3+ep1_p4+ep1_p5
 # final = depth(final, 10)
 amzn.set_output(0)
 wakanim.set_output(1)
-fixed_waka.set_output(2)
+# fixed_waka.set_output(2)
 ep1_p3.set_output(3)
 # 38523
 # 317

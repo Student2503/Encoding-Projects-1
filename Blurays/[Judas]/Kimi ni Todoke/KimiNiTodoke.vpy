@@ -39,7 +39,7 @@ def cooldenoise(clip: vs.VideoNode,
             mask = lvf.denoise.adaptive_mask(clip, luma_scaling = luma_scaling) if dmask is None else dmask
 
             if BM3D == True:
-                denoise = mvf.BM3D(clip, sigma=lsigma, pre=predenoise, profile1="lc") 
+                denoise = mvf.BM3D(clip, sigma=lsigma, pre=pre_denoise, profile1="lc") 
             else:                
                 denoise = CoolDegrain(clip, tr=tr, thsad=thsad, thsadc=thsadc, bits=32, blksize=blksize, overlap=overlap)
             

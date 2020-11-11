@@ -1,1 +1,1 @@
-Cleanup in progress, repo will be back up soon™
+Older stuff is probably shit, if you really want to see something, check one of the newer ones.

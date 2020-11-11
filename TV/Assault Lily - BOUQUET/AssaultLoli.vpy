@@ -16,7 +16,6 @@ from vsutil import *
 import sys
 
 core.max_cache_size = 8 * 1024
-shader = "C:/FSRCNNX_x2_16-0-4-1.glsl"
 
 def dehardsub(clip_a: vs.VideoNode, clip_b: vs.VideoNode,
               signs = [], replace_scenes = []) -> vs.VideoNode:
@@ -37,7 +36,7 @@ def masked_deband(clip: vs.VideoNode,
                   range:  int = 15, y: float = 32, cb: int = 24,
                   cr: int = 24, grainy: float = 48, grainc: float = 0, output_depth: float = 16, **kwargs) -> vs.VideoNode:
         deband = core.f3kdb.Deband(clip, range=range, y=y, cb=cb, cr=cr, grainy=grainy, grainc=grainc, output_depth=output_depth)     
-        mask = lvf.denoise.detail_mask(ref, pre_denoise=pre_denoise, rad=lr, radc=2, brz_a=brz_a, brz_b=brz_b) if dmask is None else dmask
+        mask = lvf.denoise.detail_mask(clip, pre_denoise=pre_denoise, rad=lr, radc=2, brz_a=brz_a, brz_b=brz_b) if dmask is None else dmask
         if show_mask:
            return mask
         return core.std.MaskedMerge(deband, clip, depth(mask, 16)) if mask else deband
@@ -55,7 +54,7 @@ def cooldenoise(clip: vs.VideoNode,
             mask = lvf.denoise.adaptive_mask(clip, luma_scaling = luma_scaling) if dmask is None else dmask
 
             if BM3D == True:
-                denoise = mvf.BM3D(clip, sigma=lsigma, pre=predenoise, profile1="lc") 
+                denoise = mvf.BM3D(clip, sigma=lsigma, pre=pre_denoise, profile1="lc") 
             else:                
                 denoise = CoolDegrain(clip, tr=tr, thsad=thsad, thsadc=thsadc, bits=32, blksize=blksize, overlap=overlap)
             
@@ -76,16 +75,16 @@ def cooldenoise(clip: vs.VideoNode,
                 return mask
 
 signs = [
-    (5642, 5869), (3463, 3509), (3881, 4000), (7297, 7394), (8779, 8837), (8851, 8903), (9858, 10042), 
-    (10970, 10992), (19846, 19893), (25089, 25160), (27898, 27923), (34405, 34524)
+    (5666, 5893), (3487, 3533), (3905, 4024), (7321, 7419), (8802, 8861), (8873, 8927), (9882, 10066), 
+    (10994, 11016), (19870, 19917), (25113, 25184), (27922, 27947), (34429, 34548)
 ]
 
 replace = [
 ]
 
 # Source
-amzn = lvf.src(r'Z:/Encoding-Projects/TV/Assault Lily - BOUQUET/src/Assault Lily - Bouquet - 01 (Amazon Prime VBR 1080p).mkv')
-wakanim = lvf.src(r'Z:/Encoding-Projects/TV/Assault Lily - BOUQUET/src/Assault Lily - Bouquet - 01v2 (Wakanim DE 1080p).mkv')
+amzn = lvf.src(r'src/Assault Lily - Bouquet - 01 (Amazon Prime VBR 1080p).mkv')
+wakanim = lvf.src(r'src/Assault Lily - Bouquet - 01v2 (Wakanim DE 1080p).mkv')
 
 # Editing wakanim clip to work
 
@@ -97,8 +96,8 @@ ep1_p5 = core.std.Trim(amzn, 34669, 34692)
 
 fixed_waka = ep1_p1+ep1_p2+ep1_p3+ep1_p4+ep1_p5
 
-# dehardsubbed = dehardsub(fixed_waka, amzn, signs, replace)
-# src = depth(dehardsubbed, 16)
+dehardsubbed = dehardsub(fixed_waka, amzn, signs, replace)
+src = depth(dehardsubbed, 16)
 
 # Filtering
 
@@ -142,9 +141,7 @@ fixed_waka = ep1_p1+ep1_p2+ep1_p3+ep1_p4+ep1_p5
 
 # # Output
 # final = depth(final, 10)
-amzn.set_output(0)
-wakanim.set_output(1)
-# fixed_waka.set_output(2)
-ep1_p3.set_output(3)
+# fixed_waka.set_output(1)
+dehardsubbed.set_output(0)
 # 38523
 # 317

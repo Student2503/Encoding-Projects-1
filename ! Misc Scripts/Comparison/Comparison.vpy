@@ -18,4 +18,5 @@ print(file=sys.stderr)
 print(f"Vapoursynth: Beginning job - (", srcFile, ")", file=sys.stderr)
 src = core.ffms2.Source(srcFile)
 src = src[::1440]
+src = core.resize.Bicubic(src, format=vs.RGB24)
 src.set_output()

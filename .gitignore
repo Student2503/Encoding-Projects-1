@@ -16,12 +16,17 @@
 *.ass
 *.code-workspace
 *.png
+*.dgi
+*.lwi
+Start-BatchJudasEncode.ps1
 
 # User-specific folders
-src/
 .misc/
 MVs/
+src/
 screens/
+raw/
+encodes/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -57,3 +62,4 @@ screens/
 *.scc
 ecf/
 rcf/
+*.m2t

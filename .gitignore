@@ -19,8 +19,9 @@
 
 # User-specific folders
 src/
-.Misc/
-! OP & ED/
+.misc/
+MVs/
+screens/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
